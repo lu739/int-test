@@ -23,17 +23,23 @@ export default {
         },
 
         fetchLeads() {
-            this.$inertia.get(route('get-leads'))
-                .then(response => {
-                    console.log(response);
-                })
-                .catch(error => {
-                    console.error(error);
-                });
+            // this.$inertia.get(route('get-leads'))
+            //     .then(response => {
+            //         console.log(response);
+            //     })
+            //     .catch(error => {
+            //         console.error(error);
+            //     });
         },
     },
     mounted() {
-        console.log(route);
+        axios.get('/get-leads')
+            .then(response => {
+                console.log(response);
+            })
+            .catch(error => {
+                console.error(error);
+            });
         this.fetchLeads();
     }
 }
