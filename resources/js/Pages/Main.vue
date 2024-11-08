@@ -1,6 +1,7 @@
 <script>
 import MainLayout from '@/Layouts/MainLayout.vue';
 import moment from 'moment';
+import { route } from 'ziggy-js';
 export default {
     name: "Main",
     components: {
@@ -19,17 +20,20 @@ export default {
     methods: {
         formatDate(date) {
             return moment(date).format('DD.MM.YYYY HH:mm');
-        }
-    },
+        },
 
-    async mounted() {
-        try {
-            const response = await axios.get(this.route('get-leads'));
-            console.log(response.data);
-            // this.leads = response.data;
-        } catch (error) {
-            console.error('Ошибка при получении данных:', error);
-        }
+        fetchLeads() {
+            this.$inertia.get(route('get-leads'))
+                .then(response => {
+                    console.log(response);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        },
+    },
+    mounted() {
+        this.fetchLeads();
     }
 }
 </script>
