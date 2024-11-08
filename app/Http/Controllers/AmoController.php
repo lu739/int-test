@@ -7,14 +7,30 @@ use Illuminate\Support\Facades\Http;
 
 class AmoController extends Controller
 {
+    private function makeApiRequest($endpoint)
+    {
+        return Http::withHeaders([
+            'Authorization' => 'Bearer ' . env('AMO_CRM_TOKEN')
+        ])->get(env('AMO_CRM_HOST') . 'api/v4/' . $endpoint);
+    }
+
     public function getLeads()
     {
-        $data = Http::withHeaders([
-            'Authorization' => 'Bearer ' . env('AMO_CRM_TOKEN')
-        ])->get(env('AMO_CRM_HOST').'api/v4/leads');
+        $data = $this->makeApiRequest('leads');
 
         return response()->json([
             'data' => $data->json()
         ]);
     }
+
+    public function getEvents()
+    {
+        dd('events');
+        $data = $this->makeApiRequest('events');
+
+        return response()->json([
+            'data' => $data->json()
+        ]);
+    }
+
 }

@@ -7,11 +7,6 @@ export default {
     components: {
         Mainlayout: MainLayout
     },
-    props: {
-        amoCrmHost: String,
-        amoCrmToken: String,
-        data: Object
-    },
     data() {
         return {
             leads: []
@@ -59,7 +54,7 @@ export default {
                     </tr>
                 </thead>
                 <tbody>
-                <tr v-for="lead in leads" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                <tr v-for="lead in leads" :key="lead.id" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                     <td class="px-6 py-4">
                         {{ lead.id }}
                     </td>
