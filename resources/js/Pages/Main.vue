@@ -33,13 +33,6 @@ export default {
         },
     },
     mounted() {
-        // axios.get('/get-leads')
-        //     .then(response => {
-        //         console.log(response);
-        //     })
-        //     .catch(error => {
-        //         console.error(error);
-        //     });
         this.fetchLeads();
     }
 }
