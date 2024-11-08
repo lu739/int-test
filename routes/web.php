@@ -12,3 +12,4 @@ Route::get('/bind-contact', BindContactController::class)->name('bindContact');
 Route::get('/history', HistoryController::class)->name('history');
 
 Route::get('/get-leads', [AmoController::class, 'getLeads'])->name('get-leads');
+Route::get('/get-events', [AmoController::class, 'getEvents'])->name('get-events');
