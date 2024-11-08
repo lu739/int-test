@@ -25,7 +25,6 @@ class AmoController extends Controller
 
     public function getEvents()
     {
-        dd('events');
         $data = $this->makeApiRequest('events');
 
         return response()->json([
