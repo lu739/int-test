@@ -71,7 +71,7 @@ export default {
                         {{ formatDate(event.created_at) }}
                     </td>
                     <td class="px-6 py-4">
-                        {{ LeadTypeEnum[event.type] || '' }}
+                        {{ leadTypes[event.type] ?? '' }}
                     </td>
                     <td class="px-6 py-4">
                         {{ event.value_before }} => {{ event.value_after }}
