@@ -25,7 +25,7 @@ export default {
         fetchLeads() {
             axios.get(route('get-leads'))
                 .then(response => {
-                    console.log(response);
+                    this.leads = response.data?._embedded?.leads ?? [];
                 })
                 .catch(error => {
                     console.error(error);
