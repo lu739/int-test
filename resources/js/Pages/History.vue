@@ -14,7 +14,7 @@ export default {
     },
     methods: {
         formatDate(date) {
-            return moment(date).format('DD.MM.YYYY HH:mm');
+            return moment.unix(date).format('DD.MM.YYYY HH:mm');
         },
 
         fetchEvents() {
