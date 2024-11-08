@@ -9,6 +9,7 @@ class AmoController extends Controller
 {
     public function getLeads()
     {
+        dd(env('AMO_CRM_HOST').'api/v4/leads');
         $data = Http::withHeaders([
             'Authorization' => 'Bearer ' . env('AMO_CRM_TOKEN')
         ])->get(env('AMO_CRM_HOST').'api/v4/leads');
