@@ -34,7 +34,6 @@ export default {
 </script>
 
 <template>
-    <h1>{{this.data}}</h1>
     <Mainlayout>
         <h1>Выбор сделки</h1>
 
