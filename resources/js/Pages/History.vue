@@ -7,6 +7,18 @@ export default {
     components: {
         Mainlayout: MainLayout
     },
+    props: {
+        leadTypes: Array
+    },
+    computed: {
+        leadTypes() {
+            const enumObject = {};
+            this.leadTypes.forEach(type => {
+                enumObject[type.value] = type.russian();
+            });
+            return enumObject;
+        }
+    }
     data() {
         return {
             events: []
@@ -59,7 +71,7 @@ export default {
                         {{ formatDate(event.created_at) }}
                     </td>
                     <td class="px-6 py-4">
-                        {{ event.type }}
+                        {{ LeadTypeEnum[event.type] || '' }}
                     </td>
                     <td class="px-6 py-4">
                         {{ event.value_before }} => {{ event.value_after }}
