@@ -18,18 +18,17 @@ export default {
         },
 
         fetchEvents() {
-            // axios.get(route('get-events'))
-            //     .then(response => {
-            //         console.log(response.data?.data?._embedded?.events );
-            //         this.events = response.data?.data?._embedded?.events ?? [];
-            //     })
-            //     .catch(error => {
-            //         console.error(error);
-            //     });
+            axios.get(route('get-events'))
+                .then(response => {
+                    console.log(response.data?.data?._embedded?.events );
+                    this.events = response.data?.data?._embedded?.events ?? [];
+                })
+                .catch(error => {
+                    console.error(error);
+                });
         },
     },
     mounted() {
-        console.log('mounted')
         this.fetchEvents();
     }
 }
