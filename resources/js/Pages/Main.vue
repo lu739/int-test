@@ -33,6 +33,7 @@ export default {
         },
     },
     mounted() {
+        console.log(route);
         this.fetchLeads();
     }
 }
