@@ -23,7 +23,7 @@ export default {
         },
 
         fetchLeads() {
-            this.$inertia.get(route('get-leads'))
+            axios.get(route('get-leads'))
                 .then(response => {
                     console.log(response);
                 })
