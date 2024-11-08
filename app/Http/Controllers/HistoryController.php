@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\LeadTypeEnum;
+use App\Enum\LeadTypeEnum;
 use Inertia\Inertia;
 
 class HistoryController extends Controller
