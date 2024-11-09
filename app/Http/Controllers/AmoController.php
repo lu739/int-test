@@ -2,52 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Actions\BindLogs\Create\CreateBindLog;
+use App\Http\Actions\BindLogs\Create\Dto\CreateBindLogsDto;
 use App\Services\Amo\AmoServiceInterface;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 
 class AmoController extends Controller
 {
     public function __construct(
-        private AmoServiceInterface $amoService
+        private readonly AmoServiceInterface $amoService
     ) {
-    }
-    private function makeApiPostRequest($endpoint, $data = [])
-    {
-        return Http::withHeaders([
-            'Authorization' => 'Bearer ' . env('AMO_CRM_TOKEN'),
-            'Content-Type' => 'application/json',
-        ])->post(env('AMO_CRM_HOST') . 'api/v4/' . $endpoint, $data);
     }
 
     public function getLeads()
     {
-        $this->amoService->getLeads();
-    }
-
-    public function addContact(Request $request): JsonResponse
-    {
-        $formData = [
-            [
-                'name' => $request->input('contact.name'),
-                'custom_fields_values' => [
-                    [
-                        "field_name" => "Телефон",
-                        "field_code" => "PHONE",
-                        "field_type" => "multitext",
-                        "values" => [
-                            [
-                                "value" => $request->input('contact.phone')
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ];
-
-        $this->amoService->addContact($formData);
+        return $this->amoService->getLeads();
     }
 
     public function bindContactToLead(Request $request)
@@ -67,12 +37,22 @@ class AmoController extends Controller
             ], 422);
         }
 
-        $this->amoService->bindContactToLead($request);
+        $response = $this->amoService->bindContactToLead($request);
+        $data = $response->getData(true);
+
+        $dto = CreateBindLogsDto::fromResponse(
+            $data,
+            $request->get('lead_id')
+        );
+
+        (new CreateBindLog)->handle($dto);
+
+        return $response;
     }
 
     public function getContacts(int $lead_id)
     {
-        $this->amoService->getLeadContacts($lead_id);
+        return $this->amoService->getLeadContacts($lead_id);
     }
 
 }
