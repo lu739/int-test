@@ -1,52 +1,21 @@
 <script>
 import MainLayout from '@/Layouts/MainLayout.vue';
 import moment from 'moment';
-import { route } from 'ziggy-js';
+
 export default {
     name: "History",
     components: {
         Mainlayout: MainLayout
     },
-    data() {
-        return {
-            events: [],
-            eventTypes: Object,
-        }
+    props: {
+        logs: Array
     },
     methods: {
         formatDate(date) {
-            return moment.unix(date).format('DD.MM.YYYY HH:mm');
-        },
-
-        fetchEvents() {
-            axios.get(route('get-events'))
-                .then(response => {
-                    this.events = response.data?.data?._embedded?.events ?? [];
-                })
-                .catch(error => {
-                    console.error(error);
-                });
-        },
-
-        fetchEventTypes() {
-            axios.get(route('get-event-types'))
-                .then(response => {
-                    const eventTypesArray = response.data?.data?._embedded?.events_types ?? [];
-                    if (eventTypesArray.length > 0) {
-                        this.eventTypes = eventTypesArray.reduce((accumulator, item) => {
-                            accumulator[item.key] = item.lang;
-                            return accumulator;
-                        }, {});
-                    }
-                })
-                .catch(error => {
-                    console.error(error);
-                });
+            return moment(date).format('DD.MM.YYYY HH:mm');
         },
     },
     mounted() {
-        this.fetchEventTypes();
-        this.fetchEvents();
     }
 }
 </script>
@@ -71,15 +40,15 @@ export default {
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="event in events" :key="event.id" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                <tr v-for="log in logs" :key="log.id" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                     <td class="px-6 py-4">
-                        {{ formatDate(event.created_at) }}
+                        {{ formatDate(log.created_at) }}
                     </td>
                     <td class="px-6 py-4">
-                        {{ this.eventTypes[event.type] ?? '' }}
+                        {{ log.message }}
                     </td>
                     <td class="px-6 py-4">
-                        {{ event.value_before }} => {{ event.value_after }}
+                        {{ log.is_success ? 'Успешно' : 'Не успешно' }}
                     </td>
                 </tr>
                 </tbody>

@@ -52,14 +52,52 @@ class AmoService implements AmoServiceInterface
         ]);
     }
 
+    public function addNoteToContact(string $note, int $contact_id): JsonResponse|Throwable
+    {
+        $formData = [[
+            'note_type' => 'common',
+            'params' => [
+                'text' => $note
+            ]
+        ]];
+
+        try {
+            $response = $this->makeApiPostRequest('contacts/'. $contact_id . '/notes', $formData);
+        } catch (Throwable $th) {
+            throw $th;
+        }
+
+        return response()->json([
+            'data' => $response->json()
+        ]);
+    }
+
     public function bindContactToLead(Request $request): JsonResponse
     {
+        $formDataAddContact = [
+            [
+                'name' => $request->input('contact.name'),
+                'custom_fields_values' => [
+                    [
+                        "field_name" => "Телефон",
+                        "field_code" => "PHONE",
+                        "field_type" => "multitext",
+                        "values" => [
+                            [
+                                "value" => $request->input('contact.phone')
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
         try {
-            $addContactResponse = $this->addContact((array)$request);
+            $addContactResponse = $this->addContact($formDataAddContact);
         } catch (Throwable $e) {
             return response()->json([
-                'message' => 'Не удалось добавить контакт',
-                'error' => $e,
+                'message' => 'Не удалось добавить контакт по сделке '. $request->input('lead_id'),
+                'log' => $e->getMessage(),
             ]);
         }
 
@@ -67,12 +105,21 @@ class AmoService implements AmoServiceInterface
 
         if (!$contact) {
             return response()->json([
-                'success' => false,
-                'errors' => 'Не удалось получить добавленный контакт',
+                'message' => 'Не удалось получить контакт по сделке '. $request->input('lead_id'),
+                'log' => '',
             ], 404);
         }
 
-        $formData = [
+        try {
+            $this->addNoteToContact($request->input('contact.comment'), $contact['id']);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Не удалось добавить комментарий контакту '. $contact['id'] . ' по сделке '. $request->input('lead_id'),
+                'log' => $e->getMessage(),
+            ]);
+        }
+
+        $formDataBindContact = [
             [
                 'to_entity_id' => $contact['id'],
                 'to_entity_type' => 'contacts',
@@ -80,16 +127,17 @@ class AmoService implements AmoServiceInterface
         ];
 
         try {
-            $response = $this->makeApiPostRequest('leads/' . $request->input('lead_id') . '/link', $formData);
+            $response = $this->makeApiPostRequest('leads/' . $request->input('lead_id') . '/link', $formDataBindContact);
         } catch (Throwable $e) {
             return response()->json([
-                'message' => 'Не удалось привязать контакт к сделке',
-                'error' => $e,
+                'message' => 'Не удалось привязать контакт '. $contact['id'] . ' к сделке '. $request->input('lead_id'),
+                'log' => $e->getMessage(),
             ]);
         }
 
         return response()->json([
-            'data' => $response->json()
+            'data' => $response->json(),
+            'message' => 'Успешно привязан контакт '. $contact['id'] .' к сделке ' . $request->input('lead_id'),
         ]);
     }
 
