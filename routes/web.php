@@ -13,7 +13,5 @@ Route::get('/history', HistoryController::class)->name('history');
 
 Route::post('/bind-contact-to-lead', [AmoController::class, 'bindContactToLead'])->name('bind-contact-to-lead');
 Route::get('/get-leads', [AmoController::class, 'getLeads'])->name('get-leads');
-Route::get('/get-events', [AmoController::class, 'getEvents'])->name('get-events');
-Route::get('/get-event-types', [AmoController::class, 'getEventTypes'])->name('get-event-types');
 Route::get('/get-contacts/{lead_id}', [AmoController::class, 'getContacts'])->name('get-contacts');
 
