@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Amo\AmoServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -9,11 +10,9 @@ use Illuminate\Support\Facades\Validator;
 
 class AmoController extends Controller
 {
-    private function makeApiRequest($endpoint)
-    {
-        return Http::withHeaders([
-            'Authorization' => 'Bearer ' . env('AMO_CRM_TOKEN')
-        ])->get(env('AMO_CRM_HOST') . 'api/v4/' . $endpoint);
+    public function __construct(
+        private AmoServiceInterface $amoService
+    ) {
     }
     private function makeApiPostRequest($endpoint, $data = [])
     {
@@ -25,31 +24,10 @@ class AmoController extends Controller
 
     public function getLeads()
     {
-        $data = $this->makeApiRequest('leads?with=contacts&order[created_at]=desc');
-
-        return response()->json([
-            'data' => $data->json()
-        ]);
+        $this->amoService->getLeads();
     }
 
-    public function getEvents()
-    {
-        $data = $this->makeApiRequest('events');
-
-        return response()->json([
-            'data' => $data->json()
-        ]);
-    }
-    public function getEventTypes()
-    {
-        $data = $this->makeApiRequest('events/types');
-
-        return response()->json([
-            'data' => $data->json()
-        ]);
-    }
-
-    public function addContact(Request $request): JsonResponse|\Throwable
+    public function addContact(Request $request): JsonResponse
     {
         $formData = [
             [
@@ -69,16 +47,9 @@ class AmoController extends Controller
             ]
         ];
 
-        try {
-            $data = $this->makeApiPostRequest('contacts', $formData);
-        } catch (\Throwable $th) {
-            return $th;
-        }
-
-        return response()->json([
-            'data' => $data->json()
-        ]);
+        $this->amoService->addContact($formData);
     }
+
     public function bindContactToLead(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -96,46 +67,12 @@ class AmoController extends Controller
             ], 422);
         }
 
-        $addContactResponse = $this->addContact($request);
-
-        if ($addContactResponse instanceof \Throwable) {
-            return response()->json([
-                'success' => false,
-                'errors' => 'Не удалось добавить контакт',
-            ], 422);
-        }
-
-        $contact = json_decode($addContactResponse->getContent(), true)['data']['_embedded']['contacts'][0] ?? null;
-
-        if (!$contact) {
-            dump(json_decode($addContactResponse->getContent(), true));
-            return response()->json([
-                'success' => false,
-                'errors' => 'Не удалось получить добавленный контакт',
-            ], 422);
-        }
-
-        $formData = [
-            [
-                'to_entity_id' => $contact['id'],
-                'to_entity_type' => 'contacts',
-            ]
-        ];
-
-        $data = $this->makeApiPostRequest('leads/' . $request->input('lead_id') . '/link', $formData);
-
-        return response()->json([
-            'data' => $data->json()
-        ]);
+        $this->amoService->bindContactToLead($request);
     }
 
     public function getContacts(int $lead_id)
     {
-        $data = $this->makeApiRequest('leads/'.$lead_id.'/links?filter[to_entity_type]=contacts');
-
-        return response()->json([
-            'data' => $data->json()
-        ]);
+        $this->amoService->getLeadContacts($lead_id);
     }
 
 }
