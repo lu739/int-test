@@ -26,6 +26,10 @@ export default {
                     console.error(error);
                 });
         },
+
+        bindContact(id) {
+            this.$inertia.get(route('bind-contact', { lead_id: id }));
+        }
     },
     mounted() {
         this.fetchLeads();
@@ -35,7 +39,7 @@ export default {
 
 <template>
     <Mainlayout>
-        <h1>Выбор сделки</h1>
+        <h1 class="font-bold mb-2 text-2xl">Выбор сделки</h1>
 
         <div class="relative overflow-x-auto">
             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -50,6 +54,12 @@ export default {
                         <th scope="col" class="px-6 py-3">
                             Дата создания
                         </th>
+                        <th scope="col" class="px-6 py-3">
+                            Есть контакт
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Привязать контакт
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -62,6 +72,14 @@ export default {
                     </td>
                     <td class="px-6 py-4">
                         {{ formatDate(lead.created_at) }}
+                    </td>
+                    <td class="px-6 py-4">
+                        {{ lead._embedded?.contacts?.length ? 'Да' : 'Нет' }}
+                    </td>
+                    <td class="px-6 py-4">
+                        <button v-if="lead._embedded?.contacts?.length === 0"
+                           @click="this.bindContact(lead.id)"
+                           class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Привязать</button>
                     </td>
                 </tr>
                 </tbody>

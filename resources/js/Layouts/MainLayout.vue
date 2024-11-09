@@ -1,6 +1,5 @@
 <script setup>
 import { ref } from 'vue';
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
@@ -36,7 +35,7 @@ import { Link } from '@inertiajs/vue3';
                                     :href="route('history')"
                                     :active="route().current('history')"
                                 >
-                                    История (Лог)
+                                    История
                                 </NavLink>
                             </div>
                         </div>

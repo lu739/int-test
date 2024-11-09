@@ -7,21 +7,10 @@ export default {
     components: {
         Mainlayout: MainLayout
     },
-    props: {
-        leadTypes: Array
-    },
-    computed: {
-        leadTypes() {
-            const enumObject = {};
-            this.leadTypes.forEach(type => {
-                enumObject[type.value] = type.russian();
-            });
-            return enumObject;
-        }
-    },
     data() {
         return {
-            events: []
+            events: [],
+            eventTypes: Object,
         }
     },
     methods: {
@@ -32,8 +21,23 @@ export default {
         fetchEvents() {
             axios.get(route('get-events'))
                 .then(response => {
-                    console.log(response.data?.data?._embedded?.events );
                     this.events = response.data?.data?._embedded?.events ?? [];
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        },
+
+        fetchEventTypes() {
+            axios.get(route('get-event-types'))
+                .then(response => {
+                    const eventTypesArray = response.data?.data?._embedded?.events_types ?? [];
+                    if (eventTypesArray.length > 0) {
+                        this.eventTypes = eventTypesArray.reduce((accumulator, item) => {
+                            accumulator[item.key] = item.lang;
+                            return accumulator;
+                        }, {});
+                    }
                 })
                 .catch(error => {
                     console.error(error);
@@ -41,6 +45,7 @@ export default {
         },
     },
     mounted() {
+        this.fetchEventTypes();
         this.fetchEvents();
     }
 }
@@ -48,7 +53,7 @@ export default {
 
 <template>
     <Mainlayout>
-        <h1>История (Лог)</h1>
+        <h1 class="font-bold mb-2 text-2xl">История (Лог)</h1>
 
         <div class="relative overflow-x-auto">
             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -71,7 +76,7 @@ export default {
                         {{ formatDate(event.created_at) }}
                     </td>
                     <td class="px-6 py-4">
-                        {{ leadTypes[event.type] ?? '' }}
+                        {{ this.eventTypes[event.type] ?? '' }}
                     </td>
                     <td class="px-6 py-4">
                         {{ event.value_before }} => {{ event.value_after }}
